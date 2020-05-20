@@ -441,7 +441,8 @@ class LDAPAuthenticator(Authenticator):
             self.log.debug("username:%s Using dn %s", username, userdn)
             found = False
             for group in self.allowed_groups:
-                self.log.debug(group)
+                self.log.warning(username)
+                self.log.warning(userdn)
                 group_filter = (
                     "(|"
                     "(member={userdn})"
