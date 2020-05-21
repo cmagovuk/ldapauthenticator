@@ -339,11 +339,11 @@ class LDAPAuthenticator(Authenticator):
         
         if self.mock_authentication:
             self.log.warning("Using a mock LDAP server.")
-            server = ldap3.Server('my_fake_server')
+            server = ldap3.Server(self.server_address)
             conn = ldap3.Connection(
                 server, 
-                user='cn=my_user,ou=test,o=lab', 
-                password='my_password',
+                user=userdn, 
+                password=password,
                 client_strategy=ldap3.MOCK_SYNC
             )
             conn.strategy.add_entry(
@@ -440,7 +440,7 @@ class LDAPAuthenticator(Authenticator):
             if is_bound:
                 break
 
-        if not is_bound or self.mock_authentication:
+        if not (is_bound or self.mock_authentication):
             msg = "Invalid password for user '{username}'"
             self.log.warning(msg.format(username=username))
             return None
