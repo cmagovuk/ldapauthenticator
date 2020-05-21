@@ -347,7 +347,7 @@ class LDAPAuthenticator(Authenticator):
             )
             connection.strategy.add_entry(
                 'CN=Mock User,OU=Windows 10 Users,OU=CMA,DC=cma,DC=gov,DC=uk', 
-                {'userPassword': 'mock_password', 'sn': 'user0_sn', 'revision': 0}
+                {'userPassword': 'mock_password', 'sn': 'user0_sn', 'revision': 0, 'sAMAccountName':'mock.user'}
             )
 
         else:
