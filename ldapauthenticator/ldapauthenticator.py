@@ -337,7 +337,7 @@ class LDAPAuthenticator(Authenticator):
 
     def get_connection(self, userdn, password):
         
-        if mock_authentication:
+        if self.mock_authentication:
             server = ldap3.Server('mock_server')
             connection = ldap3.Connection(
                 server, 
