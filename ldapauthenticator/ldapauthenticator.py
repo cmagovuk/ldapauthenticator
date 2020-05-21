@@ -339,13 +339,13 @@ class LDAPAuthenticator(Authenticator):
         
         if self.mock_authentication:
             server = ldap3.Server('mock_server')
-            connection = ldap3.Connection(
+            conn = ldap3.Connection(
                 server, 
                 user='CN=mock_svc,OU=Windows 10 Users,OU=CMA,DC=cma,DC=gov,DC=uk', 
                 password='mock_svc_password', 
                 client_strategy=ldap3.MOCK_SYNC
             )
-            connection.strategy.add_entry(
+            conn.strategy.add_entry(
                 'CN=Mock User,OU=Windows 10 Users,OU=CMA,DC=cma,DC=gov,DC=uk', 
                 {'userPassword': 'mock_password', 'sn': 'user0_sn', 'revision': 0, 'sAMAccountName':'mock.user'}
             )
