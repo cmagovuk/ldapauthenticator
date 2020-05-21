@@ -267,7 +267,7 @@ class LDAPAuthenticator(Authenticator):
         conn = self.get_connection(
             userdn=search_dn, password=self.lookup_dn_search_password
         )
-        is_bound = conn.bind() and not self.mock_authentication
+        is_bound = conn.bind()
         if not is_bound:
             msg = "Failed to connect to LDAP server with search user '{search_dn}'"
             self.log.warning(msg.format(search_dn=search_dn))
@@ -338,6 +338,7 @@ class LDAPAuthenticator(Authenticator):
     def get_connection(self, userdn, password):
         
         if self.mock_authentication:
+            self.log.warning("Using a mock LDAP server.")
             server = ldap3.Server('my_fake_server')
             conn = ldap3.Connection(
                 server, 
