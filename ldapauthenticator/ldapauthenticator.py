@@ -28,6 +28,15 @@ class LDAPAuthenticator(Authenticator):
         Defaults to `636` if `use_ssl` is set, `389` otherwise.
         """,
     )
+    
+    mock_authentication = Bool(
+        config=True,
+        default=False,
+        help="""
+        Mock auth locally rather than contacting a server.
+        Only use this for development.
+        """,
+    )
 
     def _server_port_default(self):
         if self.use_ssl:
@@ -258,7 +267,7 @@ class LDAPAuthenticator(Authenticator):
         conn = self.get_connection(
             userdn=search_dn, password=self.lookup_dn_search_password
         )
-        is_bound = conn.bind()
+        is_bound = conn.bind() or self.mock_authentication
         if not is_bound:
             msg = "Failed to connect to LDAP server with search user '{search_dn}'"
             self.log.warning(msg.format(search_dn=search_dn))
@@ -327,15 +336,31 @@ class LDAPAuthenticator(Authenticator):
         return (user_dn, response[0]["dn"])
 
     def get_connection(self, userdn, password):
-        server = ldap3.Server(
-            self.server_address, port=self.server_port, use_ssl=self.use_ssl
-        )
-        auto_bind = (
-            self.use_ssl and ldap3.AUTO_BIND_TLS_BEFORE_BIND or ldap3.AUTO_BIND_NO_TLS
-        )
-        conn = ldap3.Connection(
-            server, user=userdn, password=password, auto_bind=auto_bind
-        )
+        
+        if self.mock_authentication:
+            self.log.warning("Using a mock LDAP server.")
+            server = ldap3.Server(self.server_address)
+            conn = ldap3.Connection(
+                server, 
+                user=userdn, 
+                password=password,
+                client_strategy=ldap3.MOCK_SYNC
+            )
+            conn.strategy.add_entry(
+                'CN=Mock User,OU=Windows 10 Users,OU=CMA,DC=cma,DC=gov,DC=uk', 
+                {'userPassword': 'mock_password', 'sn': 'user0_sn', 'revision': 0, 'sAMAccountName':'mock.user'}
+            )
+
+        else:
+            server = ldap3.Server(
+                self.server_address, port=self.server_port, use_ssl=self.use_ssl
+            )
+            auto_bind = (
+                self.use_ssl and ldap3.AUTO_BIND_TLS_BEFORE_BIND or ldap3.AUTO_BIND_NO_TLS
+            )
+            conn = ldap3.Connection(
+                server, user=userdn, password=password, auto_bind=auto_bind
+            )
         return conn
 
     def get_user_attributes(self, conn, userdn):
@@ -415,7 +440,7 @@ class LDAPAuthenticator(Authenticator):
             if is_bound:
                 break
 
-        if not is_bound:
+        if not (is_bound or self.mock_authentication):
             msg = "Invalid password for user '{username}'"
             self.log.warning(msg.format(username=username))
             return None
