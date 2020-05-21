@@ -338,11 +338,11 @@ class LDAPAuthenticator(Authenticator):
     def get_connection(self, userdn, password):
         
         if self.mock_authentication:
-            server = ldap3.Server('mock_server')
+            server = ldap3.Server('my_fake_server')
             conn = ldap3.Connection(
                 server, 
-                user='CN=mock_svc,OU=Windows 10 Users,OU=CMA,DC=cma,DC=gov,DC=uk', 
-                password='mock_svc_password', 
+                user='cn=my_user,ou=test,o=lab', 
+                password='my_password',
                 client_strategy=ldap3.MOCK_SYNC
             )
             conn.strategy.add_entry(
