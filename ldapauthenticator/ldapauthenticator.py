@@ -440,7 +440,7 @@ class LDAPAuthenticator(Authenticator):
             if is_bound:
                 break
 
-        if not is_bound:
+        if not is_bound self.mock_authentication:
             msg = "Invalid password for user '{username}'"
             self.log.warning(msg.format(username=username))
             return None
