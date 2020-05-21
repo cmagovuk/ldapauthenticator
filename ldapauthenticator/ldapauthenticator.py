@@ -267,7 +267,7 @@ class LDAPAuthenticator(Authenticator):
         conn = self.get_connection(
             userdn=search_dn, password=self.lookup_dn_search_password
         )
-        is_bound = conn.bind()
+        is_bound = conn.bind() and not self.mock_authentication
         if not is_bound:
             msg = "Failed to connect to LDAP server with search user '{search_dn}'"
             self.log.warning(msg.format(search_dn=search_dn))
