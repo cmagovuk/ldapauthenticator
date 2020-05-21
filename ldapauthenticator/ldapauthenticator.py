@@ -31,7 +31,7 @@ class LDAPAuthenticator(Authenticator):
     
     mock_authentication = Bool(
         config=True,
-        default=False
+        default=False,
         help="""
         Mock auth locally rather than contacting a server.
         Only use this for development.
