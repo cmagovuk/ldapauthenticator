@@ -267,7 +267,7 @@ class LDAPAuthenticator(Authenticator):
         conn = self.get_connection(
             userdn=search_dn, password=self.lookup_dn_search_password
         )
-        is_bound = conn.bind() or self.mock_authentication
+        is_bound = conn.bind()
         if not is_bound:
             msg = "Failed to connect to LDAP server with search user '{search_dn}'"
             self.log.warning(msg.format(search_dn=search_dn))
@@ -347,7 +347,7 @@ class LDAPAuthenticator(Authenticator):
                 client_strategy=ldap3.MOCK_SYNC
             )
             conn.strategy.add_entry(
-                'CN=Mock User,OU=Windows 10 Users,OU=CMA,DC=cma,DC=gov,DC=uk', 
+                "CN=Mock User,OU=Windows 10 Users,OU=CMA,DC=cma,DC=gov,DC=uk", 
                 {'userPassword': 'mock_password', 'sn': 'user0_sn', 'revision': 0, 'sAMAccountName':'mock.user'}
             )
 
@@ -440,7 +440,7 @@ class LDAPAuthenticator(Authenticator):
             if is_bound:
                 break
 
-        if not (is_bound or self.mock_authentication):
+        if not is_bound:
             msg = "Invalid password for user '{username}'"
             self.log.warning(msg.format(username=username))
             return None
