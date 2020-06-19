@@ -256,8 +256,7 @@ class LDAPAuthenticator(Authenticator):
         The default attempts to lowercase the username and apply `username_map` if it is
         set.
         """
-        username = username.replace('-',' ')
-        username = ''.join([s.capitalize() for s in username.split()])
+        username = normalise(username)
         username = self.username_map.get(username, username)
         return username
 
@@ -516,7 +515,11 @@ class LDAPAuthenticator(Authenticator):
             self.log.debug("username:%s attributes:%s", username, user_info)
             return {"name": username, "auth_state": user_info}
         return username
-
+    
+def normalise(username):
+    username = username.replace('-',' ')
+    username = ''.join([s.capitalize() for s in username.split()])
+    return username
 
 if __name__ == "__main__":
     import getpass
